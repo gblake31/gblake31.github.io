@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Signature Trainer</title>
+  <script src="https://cdn.jsdelivr.net/npm/vexflow@5.0.0/build/cjs/vexflow.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #cba6f7;
+      letter-spacing: 2px;
+    }
+
+    .staff-container {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+    }
+
+    #staff-div svg {
+      display: block;
+    }
+
+    /* ── Answer buttons ── */
+    .answer-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .note-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .row-label {
+      font-size: 0.8rem;
+      color: #6c7086;
+      width: 46px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .note-btn {
+      flex: 1;
+      max-width: 72px;
+      padding: 10px 0;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      font-size: 1rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-weight: bold;
+    }
+
+    .flat-btn {
+      background: #313244;
+      color: #89b4fa;
+      border-color: #45475a;
+    }
+    .flat-btn:hover { background: #45475a; border-color: #89b4fa; }
+    .flat-btn.selected { background: #1e66f5; border-color: #89dceb; color: white; }
+
+    .sharp-btn {
+      background: #313244;
+      color: #fab387;
+      border-color: #45475a;
+    }
+    .sharp-btn:hover { background: #45475a; border-color: #fab387; }
+    .sharp-btn.selected { background: #fe640b; border-color: #fab387; color: white; }
+
+    .note-btn.correct   { background: #40a02b !important; border-color: #a6e3a1 !important; color: white !important; }
+    .note-btn.incorrect { background: #d20f39 !important; border-color: #f38ba8 !important; color: white !important; }
+
+    /* ── Controls ── */
+    .controls { display: flex; gap: 16px; align-items: center; }
+
+    .submit-btn, .next-btn {
+      padding: 12px 32px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      font-family: inherit;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.15s;
+    }
+
+    .submit-btn { background: #cba6f7; color: #1e1e2e; }
+    .submit-btn:hover { background: #b4befe; }
+    .submit-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .next-btn { background: #a6e3a1; color: #1e1e2e; display: none; }
+    .next-btn:hover { background: #94e2d5; }
+
+    /* ── Feedback ── */
+    .feedback { font-size: 1.2rem; min-height: 1.6rem; text-align: center; font-weight: bold; }
+    .feedback.correct   { color: #a6e3a1; }
+    .feedback.incorrect { color: #f38ba8; }
+
+    /* ── Score ── */
+    .score { font-size: 1rem; color: #6c7086; }
+    .score span { color: #cba6f7; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>Key Signature Trainer</h1>
+
+  <div class="staff-container">
+    <div id="staff-div"></div>
+  </div>
+
+  <div class="answer-section">
+    <div class="note-row">
+      <div class="row-label">Flats ♭</div>
+      <button class="note-btn flat-btn" data-note="B" data-type="flat" onclick="toggleBtn(this)">B♭</button>
+      <button class="note-btn flat-btn" data-note="E" data-type="flat" onclick="toggleBtn(this)">E♭</button>
+      <button class="note-btn flat-btn" data-note="A" data-type="flat" onclick="toggleBtn(this)">A♭</button>
+      <button class="note-btn flat-btn" data-note="D" data-type="flat" onclick="toggleBtn(this)">D♭</button>
+      <button class="note-btn flat-btn" data-note="G" data-type="flat" onclick="toggleBtn(this)">G♭</button>
+      <button class="note-btn flat-btn" data-note="C" data-type="flat" onclick="toggleBtn(this)">C♭</button>
+      <button class="note-btn flat-btn" data-note="F" data-type="flat" onclick="toggleBtn(this)">F♭</button>
+    </div>
+    <div class="note-row">
+      <div class="row-label">Sharps ♯</div>
+      <button class="note-btn sharp-btn" data-note="F" data-type="sharp" onclick="toggleBtn(this)">F♯</button>
+      <button class="note-btn sharp-btn" data-note="C" data-type="sharp" onclick="toggleBtn(this)">C♯</button>
+      <button class="note-btn sharp-btn" data-note="G" data-type="sharp" onclick="toggleBtn(this)">G♯</button>
+      <button class="note-btn sharp-btn" data-note="D" data-type="sharp" onclick="toggleBtn(this)">D♯</button>
+      <button class="note-btn sharp-btn" data-note="A" data-type="sharp" onclick="toggleBtn(this)">A♯</button>
+      <button class="note-btn sharp-btn" data-note="E" data-type="sharp" onclick="toggleBtn(this)">E♯</button>
+      <button class="note-btn sharp-btn" data-note="B" data-type="sharp" onclick="toggleBtn(this)">B♯</button>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+
+  <div class="controls">
+    <button class="submit-btn" id="submit-btn" onclick="checkAnswer()">Check Answer</button>
+    <button class="next-btn"   id="next-btn"   onclick="nextQuestion()">Next →</button>
+  </div>
+
+  <div class="score">Score: <span id="score-correct">0</span> / <span id="score-total">0</span></div>
+
+  <script>
+    const { Renderer, Stave, StaveConnector } = VexFlow;
+
+    // ── Key signature data ──────────────────────────────────────────────────
+    // vfKey: the key name VexFlow uses for addKeySignature()
+    const KEY_SIGS = [
+      { label: 'C major (no sharps or flats)', type: 'none',  notes: [],                         vfKey: 'C'  },
+      { label: 'G major',  type: 'sharp', notes: ['F'],                                           vfKey: 'G'  },
+      { label: 'D major',  type: 'sharp', notes: ['F','C'],                                       vfKey: 'D'  },
+      { label: 'A major',  type: 'sharp', notes: ['F','C','G'],                                   vfKey: 'A'  },
+      { label: 'E major',  type: 'sharp', notes: ['F','C','G','D'],                               vfKey: 'E'  },
+      { label: 'B major',  type: 'sharp', notes: ['F','C','G','D','A'],                           vfKey: 'B'  },
+      { label: 'F♯ major', type: 'sharp', notes: ['F','C','G','D','A','E'],                       vfKey: 'F#' },
+      { label: 'C♯ major', type: 'sharp', notes: ['F','C','G','D','A','E','B'],                   vfKey: 'C#' },
+      { label: 'F major',  type: 'flat',  notes: ['B'],                                           vfKey: 'F'  },
+      { label: 'B♭ major', type: 'flat',  notes: ['B','E'],                                       vfKey: 'Bb' },
+      { label: 'E♭ major', type: 'flat',  notes: ['B','E','A'],                                   vfKey: 'Eb' },
+      { label: 'A♭ major', type: 'flat',  notes: ['B','E','A','D'],                               vfKey: 'Ab' },
+      { label: 'D♭ major', type: 'flat',  notes: ['B','E','A','D','G'],                           vfKey: 'Db' },
+      { label: 'G♭ major', type: 'flat',  notes: ['B','E','A','D','G','C'],                       vfKey: 'Gb' },
+      { label: 'C♭ major', type: 'flat',  notes: ['B','E','A','D','G','C','F'],                   vfKey: 'Cb' },
+    ];
+
+    // ── Staff rendering ───────────────────────────────────────────────────────
+    function drawGrandStaff(keySig) {
+      const div = document.getElementById('staff-div');
+      div.innerHTML = '';
+
+      const width  = 420;
+      const height = 190;
+      const renderer = new Renderer(div, Renderer.Backends.SVG);
+      renderer.resize(width, height);
+      const context = renderer.getContext();
+
+      const staveX     = 20;
+      const staveWidth = width - 40;
+
+      // Treble staff
+      const treble = new Stave(staveX, 10, staveWidth);
+      treble.addClef('treble').addKeySignature(keySig.vfKey);
+      treble.setContext(context).draw();
+
+      // Bass staff
+      const bass = new Stave(staveX, 95, staveWidth);
+      bass.addClef('bass').addKeySignature(keySig.vfKey);
+      bass.setContext(context).draw();
+
+      // Left brace + barline
+      new StaveConnector(treble, bass)
+        .setType(StaveConnector.type.BRACE)
+        .setContext(context).draw();
+      new StaveConnector(treble, bass)
+        .setType(StaveConnector.type.SINGLE_LEFT)
+        .setContext(context).draw();
+    }
+
+    // ── Game state ────────────────────────────────────────────────────────────
+    let current  = null;
+    let answered = false;
+    let scoreCorrect = 0;
+    let scoreTotal   = 0;
+
+    function nextQuestion() {
+      answered = false;
+      document.querySelectorAll('.note-btn').forEach(b => {
+        b.classList.remove('selected', 'correct', 'incorrect');
+      });
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('feedback').className   = 'feedback';
+      document.getElementById('submit-btn').style.display = 'block';
+      document.getElementById('submit-btn').disabled  = false;
+      document.getElementById('next-btn').style.display  = 'none';
+
+      current = KEY_SIGS[Math.floor(Math.random() * KEY_SIGS.length)];
+      drawGrandStaff(current);
+    }
+
+    function toggleBtn(btn) {
+      if (answered) return;
+      const otherType = btn.dataset.type === 'flat' ? 'sharp' : 'flat';
+      document.querySelectorAll(`.${otherType}-btn`).forEach(b => b.classList.remove('selected'));
+      btn.classList.toggle('selected');
+    }
+
+    function checkAnswer() {
+      if (answered) return;
+      answered = true;
+
+      const selectedFlats  = [...document.querySelectorAll('.flat-btn.selected')].map(b => b.dataset.note);
+      const selectedSharps = [...document.querySelectorAll('.sharp-btn.selected')].map(b => b.dataset.note);
+      const correctNotes   = current.notes;
+      const correctType    = current.type;
+
+      const selected = correctType === 'flat'  ? selectedFlats :
+                       correctType === 'sharp' ? selectedSharps :
+                       [...selectedFlats, ...selectedSharps];
+
+      const correctSet  = new Set(correctNotes);
+      const selectedSet = new Set(selected);
+      const isCorrect   = correctNotes.length === selected.length &&
+                          correctNotes.every(n => selectedSet.has(n));
+
+      document.querySelectorAll('.note-btn').forEach(btn => {
+        const inCorrect  = correctSet.has(btn.dataset.note) && btn.dataset.type === correctType;
+        const isSelected = btn.classList.contains('selected');
+        if (inCorrect)                     btn.classList.add('correct');
+        else if (isSelected && !inCorrect) btn.classList.add('incorrect');
+      });
+
+      scoreTotal++;
+      const feedbackEl = document.getElementById('feedback');
+      if (isCorrect) {
+        scoreCorrect++;
+        feedbackEl.textContent = '✓ Correct! ' + current.label;
+        feedbackEl.className   = 'feedback correct';
+      } else {
+        const ans = correctNotes.length === 0
+          ? 'no sharps or flats'
+          : correctNotes.join(correctType === 'flat' ? '♭, ' : '♯, ') + (correctType === 'flat' ? '♭' : '♯');
+        feedbackEl.textContent = '✗ ' + current.label + ' — ' + ans;
+        feedbackEl.className   = 'feedback incorrect';
+      }
+
+      document.getElementById('score-correct').textContent = scoreCorrect;
+      document.getElementById('score-total').textContent   = scoreTotal;
+      document.getElementById('submit-btn').style.display  = 'none';
+      document.getElementById('next-btn').style.display    = 'block';
+    }
+
+    nextQuestion();
+  </script>
+</body>
+</html>
